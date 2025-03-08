@@ -1,11 +1,22 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Title } from "./Title";
-import { login } from "../authServices";
+import { login } from "../services/authServices";
+import { useWebSocket } from "../contexts/WebSocketContext";
+import { Alert } from "./Alert";
+import { useNavigate } from "react-router";
+import { MessageType } from "../models/message";
+import { useAuth } from "../contexts/AuthProvider";
+
 export const LoginForm = () => {
   const [formValues, setFormValues] = useState({
     username: "",
     password: "",
   });
+  const auth = useAuth();
+  const webSocket = useWebSocket();
+  const navigate = useNavigate();
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState<MessageType>("success");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -14,14 +25,32 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    login(formValues);
+    try {
+      const response = await login(formValues);
+      console.log(response.data);
+      if (response.status === 200) {
+        localStorage.setItem("token", JSON.stringify(response.data.token));
+        auth?.setIsLoggedIn(true);
+        webSocket?.login();
+        navigate("/books");
+      }
+    } catch (error) {
+      console.error(error);
+      setType("error");
+      setMessage("Usuario o contraseña incorrectos");
+    }
   };
+
+  useEffect(() => {
+    setMessage(webSocket?.message || "");
+  }, [webSocket?.message]);
   return (
     <section className="container mx-auto px-4 p-6 text-center">
       <Title
         title="Bookstore"
         description="Inicia sesión para empezar a disfrutar de tus libros"
       />
+      {message && <Alert message={message} type={type} />}
       <form className="max-w-sm mx-auto">
         <div className="mb-5">
           <label

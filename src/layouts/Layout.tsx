@@ -12,7 +12,6 @@ export const Layout = ({ children }: LayoutProps) => {
       <header>
         <Header />
       </header>
-
       {/* Contenido principal que se expande */}
       <main className="flex-grow container mx-auto px-4 p-6">{children}</main>
 
