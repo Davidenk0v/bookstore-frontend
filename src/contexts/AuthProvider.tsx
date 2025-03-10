@@ -10,6 +10,7 @@ interface AuthContextType {
   token: string | null;
   isAdmin: boolean;
   idUser: number | null;
+  getUsername: () => string;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -21,10 +22,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [idUser, setIdUser] = useState<number | null>(null);
 
   useEffect(() => {
-    const tokens = JSON.parse(localStorage?.getItem("token") || "{}");
-    if (tokens && isValidToken(tokens.token)) {
+    const token = JSON.parse(localStorage?.getItem("token") || "{}");
+    if (token && isValidToken(token)) {
       //Si hay accessToken y es valido
-      setToken(tokens.token);
+      setToken(token);
       setIsLoggedIn(true);
       setIsAdmin(isUserAdmin());
       getUserId();
@@ -60,10 +61,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!token) return;
     try {
       const decoded: DecodedToken = jwtDecode(token);
+      console.log(decoded);
       setIdUser(decoded.userId);
     } catch (error) {
       console.error(error);
       return;
+    }
+  };
+
+  const getUsername = (): string => {
+    if (!token) return "";
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      return decoded.username;
+    } catch (error) {
+      console.error(error);
+      return "";
     }
   };
 
@@ -80,7 +93,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, setIsLoggedIn, logout, token, isAdmin, idUser }}
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        logout,
+        token,
+        isAdmin,
+        idUser,
+        getUsername,
+      }}
     >
       {children}
     </AuthContext.Provider>

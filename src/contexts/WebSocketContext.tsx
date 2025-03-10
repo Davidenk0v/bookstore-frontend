@@ -10,6 +10,7 @@ interface SocketContextType {
   messageToSend: string;
   user: string;
   connected: boolean;
+  setUsername: (username: string) => void;
 }
 
 const WebSocketContext = createContext<SocketContextType | null>(null);
@@ -55,6 +56,10 @@ export const WebSocketProvider = ({ children }: Props) => {
     };
   };
 
+  const setUsername = (username: string) => {
+    setUser(username);
+  };
+
   const close = () => {
     if (socketRef.current) {
       socketRef.current.close();
@@ -78,6 +83,7 @@ export const WebSocketProvider = ({ children }: Props) => {
   };
 
   const socket = {
+    setUsername,
     login,
     close,
     handleUserChange,

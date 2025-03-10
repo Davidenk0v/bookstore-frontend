@@ -1,12 +1,11 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { Title } from "./Title";
 import { login } from "../services/authServices";
 import { useWebSocket } from "../contexts/WebSocketContext";
 import { Alert } from "./Alert";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 import { MessageType } from "../models/message";
 import { useAuth } from "../contexts/AuthProvider";
-
 export const LoginForm = () => {
   const [formValues, setFormValues] = useState({
     username: "",
@@ -18,6 +17,10 @@ export const LoginForm = () => {
   const [message, setMessage] = useState("");
   const [type, setType] = useState<MessageType>("success");
 
+  if (auth?.isLoggedIn) {
+    return <Navigate to="/books" />;
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormValues({ ...formValues, [id]: value });
@@ -27,10 +30,11 @@ export const LoginForm = () => {
     e.preventDefault();
     try {
       const response = await login(formValues);
-      console.log(response.data);
       if (response.status === 200) {
         localStorage.setItem("token", JSON.stringify(response.data.token));
         auth?.setIsLoggedIn(true);
+        localStorage.setItem("username", formValues.username);
+        webSocket?.setUsername(formValues.username);
         webSocket?.login();
         navigate("/books");
       }
@@ -41,9 +45,6 @@ export const LoginForm = () => {
     }
   };
 
-  useEffect(() => {
-    setMessage(webSocket?.message || "");
-  }, [webSocket?.message]);
   return (
     <section className="container mx-auto px-4 p-6 text-center">
       <Title

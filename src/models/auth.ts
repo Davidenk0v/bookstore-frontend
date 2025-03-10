@@ -19,3 +19,11 @@ export interface DecodedToken {
   iat: number;
   sub: string;
 }
+
+export interface DecodedToken {
+  exp: number;
+  iat: number;
+  sub: string;
+  username: string;
+  roles: string;
+}

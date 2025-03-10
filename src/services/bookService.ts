@@ -1,11 +1,16 @@
-import { BASE_URL } from "../utils/consts";
+import axios from "axios";
 
 export const getAllBooks = async (token: string) => {
-  return await fetch(`/api/v1/book/all`, {
-    method: "GET",
-    credentials: "include", // Importante si usas cookies/sesiones
+  return axios.get(`/api/v1/book/all`, {
     headers: {
-      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getBookByIsbn = async (token: string, isbn: string) => {
+  return axios.get(`/api/v1/book/${isbn}`, {
+    headers: {
       Authorization: `Bearer ${token}`,
     },
   });
