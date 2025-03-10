@@ -25,7 +25,6 @@ export const getUserId = (): string => {
   if (!token) return "";
   try {
     const decoded: DecodedToken = jwtDecode(token);
-    console.log(decoded);
     return decoded.sub;
   } catch (error) {
     console.error(error);

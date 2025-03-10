@@ -1,3 +1,4 @@
+import { jwtDecode } from "jwt-decode";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
 
@@ -6,6 +7,11 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children }: LayoutProps) => {
+  const token = JSON.parse(localStorage.getItem("token") || '""');
+  if (token) {
+    const decode = jwtDecode(token);
+    console.log(decode);
+  }
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header fijo arriba */}

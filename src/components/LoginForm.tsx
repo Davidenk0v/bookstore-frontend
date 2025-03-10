@@ -1,7 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Title } from "./Title";
 import { login } from "../services/authServices";
-import { useWebSocket } from "../contexts/WebSocketContext";
 import { Alert } from "./Alert";
 import { Navigate, useNavigate } from "react-router";
 import { MessageType } from "../models/message";
@@ -12,7 +11,6 @@ export const LoginForm = () => {
     password: "",
   });
   const auth = useAuth();
-  const webSocket = useWebSocket();
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [type, setType] = useState<MessageType>("success");
@@ -34,8 +32,6 @@ export const LoginForm = () => {
         localStorage.setItem("token", JSON.stringify(response.data.token));
         auth?.setIsLoggedIn(true);
         localStorage.setItem("username", formValues.username);
-        webSocket?.setUsername(formValues.username);
-        webSocket?.login();
         navigate("/books");
       }
     } catch (error) {
