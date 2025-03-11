@@ -6,20 +6,35 @@ const useNotifications = (userId: string) => {
   const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
-    if (!userId) return;
-
+    if (!userId || userId == "") return;
+    console.log(userId);
     const stompClient = new Client({
-      brokerURL: "ws://localhost:8085/ws", // URL del WebSocket
+      brokerURL: `ws://localhost:8085/ws`,
       reconnectDelay: 5000,
       onConnect: () => {
-        console.log("Conectado al WebSocket");
-
+        console.log("✅ Conectado al WebSocket");
+        stompClient.debug = (message) => {
+          console.log(message);
+        };
         stompClient.subscribe(
           `/user/${userId}/queue/notifications`,
           (message) => {
-            console.log("Mensaje recibido:", message.body);
-            const notification = JSON.parse(message.body);
-            toast.info(notification.content);
+            console.log("📩 Notificación recibida:", message);
+
+            try {
+              const notification = JSON.parse(message.body);
+              if (notification?.content) {
+                toast.info(notification.content, { autoClose: 3000 });
+                console.log("Notificación mostrada:", notification.content);
+              } else {
+                console.warn(
+                  "Notificación sin contenido válido:",
+                  message.body
+                );
+              }
+            } catch (error) {
+              console.error("Error al procesar la notificación:", error);
+            }
           }
         );
       },
@@ -30,13 +45,10 @@ const useNotifications = (userId: string) => {
     stompClientRef.current = stompClient;
 
     return () => {
-      if (stompClientRef.current) {
-        stompClientRef.current.deactivate().catch(console.error);
-      }
+      stompClientRef.current?.deactivate().catch(console.error);
+      console.log("WebSocket desconectado");
     };
   }, [userId]);
-
-  return null; // No necesita devolver JSX
 };
 
 export default useNotifications;

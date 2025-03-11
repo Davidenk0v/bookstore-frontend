@@ -1,6 +1,8 @@
 import { jwtDecode } from "jwt-decode";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
+import { getUserId } from "../utils/jwtHelper";
+import NotificationComponent from "../components/websocket/NotificationComponent";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,6 +10,7 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   const token = JSON.parse(localStorage.getItem("token") || '""');
+  const userId = getUserId();
   if (token) {
     const decode = jwtDecode(token);
     console.log(decode);
@@ -18,6 +21,7 @@ export const Layout = ({ children }: LayoutProps) => {
       <header>
         <Header />
       </header>
+      <NotificationComponent userId={userId} />
       {/* Contenido principal que se expande */}
       <main className="flex-grow container mx-auto px-4 p-6">{children}</main>
 

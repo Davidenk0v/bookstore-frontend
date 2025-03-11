@@ -7,6 +7,7 @@ import { Books } from "./components/Books";
 import { BookView } from "./components/BookView";
 import { Profile } from "./components/Profile";
 import { useAuth } from "./contexts/AuthProvider";
+import { ToastContainer } from "react-toastify";
 function App() {
   const ProtectedRoute = () => {
     const auth = useAuth();
@@ -19,6 +20,7 @@ function App() {
   return (
     <BrowserRouter>
       <Layout>
+        <ToastContainer />
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />

@@ -3,8 +3,6 @@ import { BookCard } from "./BookCard";
 import { Title } from "./Title";
 import { getAllBooks } from "../services/bookService";
 import { Book, BookList } from "../models/book";
-import { ToastContainer } from "react-toastify";
-import useNotifications from "./websocket/useNotification";
 import { jwtDecode } from "jwt-decode";
 
 export const Books = () => {
@@ -26,15 +24,13 @@ export const Books = () => {
     fetchBooks();
   }, [fetchBooks]);
 
-  useNotifications(userId);
-
   return (
     <>
       <Title
         title="Bookstore"
         description="Encuentra tu próximo libro favorito"
       />
-      <ToastContainer />
+
       <section className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
         {books.map((book: Book) => (
           <BookCard key={book.isbn} book={book} />

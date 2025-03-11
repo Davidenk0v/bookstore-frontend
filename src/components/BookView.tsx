@@ -6,14 +6,16 @@ import { Book } from "../models/book";
 import { newBorrow } from "../services/borrowService";
 import { BorrowRequest } from "../models/borrow";
 import { getUserId } from "../utils/jwtHelper";
+import NotificationComponent from "./websocket/NotificationComponent";
 export const BookView = () => {
   const isbn = useParams<{ isbn: string }>().isbn;
   const [book, setBook] = useState<Book>();
+  const [userId, setUserId] = useState<string>("");
   const getBook = async () => {
     const token = JSON.parse(localStorage.getItem("token") || "");
     if (token && isbn) {
       getBookByIsbn(token, isbn).then((response) => {
-        console.log(response.data.data);
+        setUserId(getUserId());
         setBook(response.data.data[0]);
       });
     }

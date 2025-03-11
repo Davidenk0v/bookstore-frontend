@@ -3,24 +3,29 @@ import { BorrowList } from "../models/borrow";
 import { getUserBorrows, returnBorrow } from "../services/borrowService";
 import { jwtDecode } from "jwt-decode";
 import { BorrowTd } from "./BorrowTd";
+import useNotifications from "./websocket/useNotification";
 
 export const BorrowLists = () => {
   const [borrows, setBorrows] = useState<BorrowList>([]);
+  const [userId, setUserId] = useState<string>("");
   const fetchBorrows = async () => {
     const token = JSON.parse(localStorage.getItem("token") || "{}");
     const id = jwtDecode(token).sub || "";
     getUserBorrows(token, id).then((response) => {
       const borrows = response.data.body.data;
+      setUserId(id);
       setBorrows(borrows);
     });
   };
 
   const returnBook = (idBorrow: string) => {
     const token = JSON.parse(localStorage.getItem("token") || "{}");
-    returnBorrow(token, idBorrow).then(() => {
+    returnBorrow(token, idBorrow).then((response) => {
+      console.log(response);
       fetchBorrows();
     });
   };
+  useNotifications(userId);
 
   useEffect(() => {
     fetchBorrows();
